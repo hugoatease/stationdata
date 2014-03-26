@@ -1,9 +1,14 @@
+import json
+
 class Station:
     fields = ['name', 'genre', 'url', 'description', 'bitrate', \
               'track', 'artist', 'title']
 
     def __init__(self, **kwargs):
             self.populate(kwargs)
+
+    def __str__(self):
+        return json.dumps(self.export())
 
     def populate(self, kwargs):
         for field in self.fields:

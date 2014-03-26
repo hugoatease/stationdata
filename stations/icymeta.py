@@ -1,6 +1,6 @@
 #!/usr/bin/python
 import requests
-from station import Mapper, Station
+from errors import AdapterParsingError, AdapterFetchingError
 
 class ICYMeta:
     def __init__(self, url):
@@ -66,11 +66,7 @@ class ICYMeta:
 
         return self.results
 
-    def fetch(self):
-        response = requests.get(self.url, stream=True, headers={'Icy-MetaData': '1'})
-
-        meta = self.parseHTTPMeta(response)
-
+    def parseData(self, meta,   response):
         for chunk in response.iter_content():
             if not meta:
                 self.buffers['meta'] += chunk
@@ -82,6 +78,22 @@ class ICYMeta:
                     response.close()
                     self.parseAudioMeta()
                     break
+
+    def fetch(self):
+        try:
+            response = requests.get(self.url, stream=True, headers={'Icy-MetaData': '1'})
+        except:
+            raise AdapterFetchingError(self.url, "Can't open stream")
+
+        try:
+            meta = self.parseHTTPMeta(response)
+        except:
+            raise AdapterParsingError("Stream header parsing failed")
+
+        try:
+            self.parseData(meta, response)
+        except:
+            raise AdapterParsingError("Stream metadata parsing failed")
 
         return self.results
 
@@ -97,10 +109,4 @@ mappings = [
 
 if __name__ == '__main__':
     stream = ICYMeta('http://ice.somafm.com/groovesalad')
-    result = stream.fetch()
-    station = Station()
-    mapper = Mapper(station, result)
-    mapper.mappings(mappings)
-    mapper.map()
-    print station.export()
-    print station.score({'track' : 4})
+    print stream.fetch()

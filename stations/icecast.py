@@ -1,6 +1,7 @@
 #!/usr/bin/python
 import requests
 from xml.dom import minidom
+from errors import AdapterFetchingError, AdapterParsingError
 
 class Icecast:
     def __init__(self, url):
@@ -44,10 +45,19 @@ class Icecast:
         return True
 
     def fetch(self):
-        response = requests.get(self.url + '.xspf', timeout=5)
-        self.parseXSPF(response.content)
+        try:
+            response = requests.get(self.url + '.xspf', timeout=5)
+        except:
+            raise AdapterFetchingError(self.url, 'Failed to retrieve XSPF playlist')
+
+        try:
+            self.parseXSPF(response.content)
+        except:
+            raise AdapterParsingError("Failed to parse XSPF playlist")
+
         self.checkTrack()
         self.parseAnnotation()
+
         return self.results
 
 name = "Icecast"

@@ -2,6 +2,7 @@
 import requests
 import urlparse
 from xml.dom import minidom
+from errors import AdapterFetchingError, AdapterParsingError
 
 class Shoutcast:
     def __init__(self, url):
@@ -33,11 +34,21 @@ class Shoutcast:
 
         return self.results
 
-
     def fetch(self):
-        sid = self.getSID()
-        xml = self.getStatus(sid)
-        self.parseStatus(xml)
+        try:
+            sid = self.getSID()
+        except:
+            raise AdapterFetchingError(self.url, 'Unable to retrieve Station ID')
+
+        try:
+            xml = self.getStatus(sid)
+        except:
+            raise AdapterFetchingError(self.url, 'Unable to retrieve station status')
+
+        try:
+            self.parseStatus(xml)
+        except:
+            raise AdapterParsingError('Unable to parse station status')
 
         return self.results
 
