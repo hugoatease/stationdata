@@ -17,6 +17,21 @@ class Station:
             else:
                 setattr(self, field, None)
 
+    def __add__(self, other):
+        for field in self.fields:
+            if getattr(self, field) is None:
+                if getattr(other, field) is not None:
+                    setattr(self, field, getattr(other, field))
+
+        return self
+
+    def requires(self, fields):
+        for field in fields:
+            if field in self.fields:
+                if getattr(self, field) is None:
+                    return False
+        return True
+
     def score(self, weights = {}):
         score = 0
 
