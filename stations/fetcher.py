@@ -21,6 +21,7 @@
 # THE SOFTWARE.
 
 from station import Station, Mapper
+from errors import StationError
 
 from . import icecast, shoutcast, icymeta
 
@@ -57,8 +58,8 @@ class Fetcher:
         for adapter in self.available_adapters:
             try:
                 result += self.adapter_fetch(adapter)
-            except:
-                pass
+            except StationError as error:
+                print error
 
         return result
 
@@ -71,8 +72,8 @@ class Fetcher:
                 result += self.adapter_fetch(adapter)
                 if result.score(weights) >= score:
                     break
-            except:
-                pass
+            except StationError as error:
+                print error
 
         return result
 
@@ -84,8 +85,8 @@ class Fetcher:
                 result += self.adapter_fetch(adapter)
                 if result.requires(requirements):
                     break
-            except:
-                pass
+            except StationError as error:
+                print error
 
         return result
 
