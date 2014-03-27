@@ -26,7 +26,7 @@ from errors import StationError
 from . import icecast, shoutcast, icymeta
 
 class Fetcher:
-    adapters = [icymeta, shoutcast, icecast]
+    adapters = [shoutcast, icecast, icymeta]
 
     def __init__(self, url):
         self.url = url

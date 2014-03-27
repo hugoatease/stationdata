@@ -20,6 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+import config
 import requests
 from xml.dom import minidom
 from errors import AdapterFetchingError, AdapterParsingError
@@ -67,7 +68,7 @@ class Icecast:
 
     def fetch(self):
         try:
-            response = requests.get(self.url + '.xspf', timeout=5, stream=False)
+            response = requests.get(self.url + '.xspf', timeout=config.REQUEST_TIMEOUT, stream=False)
         except:
             raise AdapterFetchingError(self.url, 'Failed to retrieve XSPF playlist')
 

@@ -20,12 +20,14 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+import config
 import requests
 from errors import AdapterParsingError, AdapterFetchingError
 
 class ICYMeta:
-    def __init__(self, url):
+    def __init__(self, url, max_bytes=config.STREAM_MAX_BYTES):
         self.url = url
+        self.max_bytes = max_bytes
         self.buffers = {'meta' : '', 'audio' : ''}
         self.results = {}
         self.meta = ''
@@ -99,6 +101,10 @@ class ICYMeta:
                     response.close()
                     self.parseAudioMeta()
                     break
+
+                if self.position > self.max_bytes:
+                    response.close()
+                    raise AdapterParsingError('Maximum stream bytes reached')
 
     def fetch(self):
         try:
