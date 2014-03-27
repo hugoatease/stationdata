@@ -31,7 +31,7 @@ class Shoutcast:
         self.results = {}
 
     def getSID(self):
-        response = requests.get(urlparse.urljoin(self.url, 'index.html'), timeout=5)
+        response = requests.get(urlparse.urljoin(self.url, 'index.html'), timeout=5, stream=False)
         query = urlparse.parse_qs(urlparse.urlparse(response.url).query)
         if not query.has_key('sid'):
             return None
@@ -40,7 +40,7 @@ class Shoutcast:
 
     def getStatus(self, sid):
         url = urlparse.urljoin(self.url, 'stats?sid=' + str(sid))
-        response = requests.get(url, timeout=5)
+        response = requests.get(url, timeout=5, stream=False)
         return response.content
 
     def parseStatus(self, xml):

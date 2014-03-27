@@ -67,7 +67,7 @@ class Icecast:
 
     def fetch(self):
         try:
-            response = requests.get(self.url + '.xspf', timeout=5)
+            response = requests.get(self.url + '.xspf', timeout=5, stream=False)
         except:
             raise AdapterFetchingError(self.url, 'Failed to retrieve XSPF playlist')
 
