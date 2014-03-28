@@ -72,6 +72,9 @@ class Icecast:
         except:
             raise AdapterFetchingError(self.url, 'Failed to retrieve XSPF playlist')
 
+        if response.headers['Content-Type'] != 'application/xspf+xml':
+            raise AdapterFetchingError(self.url, 'Failed to retrieve XSPF playlist')
+
         try:
             self.parseXSPF(response.content)
         except:

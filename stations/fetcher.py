@@ -101,5 +101,5 @@ class Fetcher:
             return self.fetch_requirements(requirements)
 
 
-def fetch(url):
-    return Fetcher(url).fetch()
+def fetch(url, *args, **kwargs):
+    return Fetcher(url).fetch(*args, **kwargs)
