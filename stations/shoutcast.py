@@ -20,20 +20,21 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-import config
 import requests
 import urlparse
 from xml.dom import minidom
 from errors import AdapterFetchingError, AdapterParsingError
 
+
 class Shoutcast:
-    def __init__(self, url):
+    def __init__(self, url, config):
         self.url = url
+        self.config = config
         self.results = {}
 
     def getSID(self):
         url = urlparse.urljoin(self.url, 'index.html')
-        response = requests.get(url, timeout=config.REQUEST_TIMEOUT, stream=False)
+        response = requests.get(url, timeout=self.config['REQUEST_TIMEOUT'], stream=False)
         query = urlparse.parse_qs(urlparse.urlparse(response.url).query)
         if not query.has_key('sid'):
             return None
@@ -42,7 +43,7 @@ class Shoutcast:
 
     def getStatus(self, sid):
         url = urlparse.urljoin(self.url, 'stats?sid=' + str(sid))
-        response = requests.get(url, timeout=config.REQUEST_TIMEOUT, stream=False)
+        response = requests.get(url, timeout=self.config['REQUEST_TIMEOUT'], stream=False)
         return response.content
 
     def parseStatus(self, xml):

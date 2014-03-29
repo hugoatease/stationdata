@@ -27,6 +27,10 @@ from . import icecast, shoutcast, icymeta
 
 class Fetcher:
     adapters = [shoutcast, icecast, icymeta]
+    config = {
+        'REQUEST_TIMEOUT': 5,
+        'STREAM_MAX_BYTES': 5120000
+    }
 
     def __init__(self, url):
         self.url = url
@@ -43,7 +47,7 @@ class Fetcher:
     def adapter_fetch(self, adapter):
         current = Station()
 
-        stream = adapter.adapter(self.url)
+        stream = adapter.adapter(self.url, self.config)
         result = stream.fetch()
 
         mapper = Mapper(current, result)
