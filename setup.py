@@ -2,10 +2,10 @@
 from setuptools import setup
 
 setup(
-    name='StationData',
+    name='stationdata',
     version='0.1',
     description='Library for radio stream metadata fetching',
-    url='https://github.com/hugoatease/StationData',
+    url='https://github.com/hugoatease/stationdata',
     author='Hugo Caille',
     license='MIT',
 
