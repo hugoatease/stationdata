@@ -1,9 +1,21 @@
 from flask import Blueprint, request, jsonify
+from werkzeug.contrib.cache import MemcachedCache
+
 from stations import fetch, StationError
 from functools import wraps
 from time import time
 
 api = Blueprint('Stations Data API', __name__)
+
+cache = MemcachedCache(['127.0.0.1:11211'])
+
+def cachekey(request):
+    key = request.path
+
+    for value in request.values.keys():
+        key += value + request.values[value]
+
+    return key
 
 def perf(function):
     @wraps(function)
@@ -25,8 +37,25 @@ def perf(function):
 
     return wrapper
 
+def caching(function):
+    @wraps(function)
+    def wrapper(*args, **kwargs):
+        key = cachekey(request)
+
+        data = cache.get(key)
+        if data is not None:
+            return data
+
+        data = function(*args, **kwargs)
+        cache.set(key, data, timeout=20)
+
+        return data
+
+    return wrapper
+
 @api.route('/station')
 @perf
+@caching
 def station():
     url = request.values['stream']
     score = request.values.get('score')
