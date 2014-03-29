@@ -25,6 +25,7 @@ from errors import StationError
 
 from . import icecast, shoutcast, icymeta
 
+
 class Fetcher:
     adapters = [shoutcast, icecast, icymeta]
     config = {

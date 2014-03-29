@@ -1,13 +1,28 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, current_app, request, jsonify
 from werkzeug.contrib.cache import MemcachedCache
 
-from stations import fetch, StationError
+from stations import Fetcher, StationError
+
 from functools import wraps
 from time import time
 
 api = Blueprint('Stations Data API', __name__)
 
 cache = MemcachedCache(['127.0.0.1:11211'])
+
+def fetcher_init(url):
+    fetcher = Fetcher(url)
+
+    timeout = current_app.config.get('STATIONS_REQUEST_TIMEOUT')
+    if timeout is not None:
+        fetcher.config['REQUEST_TIMEOUT'] = timeout
+
+    max_bytes = current_app.config.get('STATIONS_MAX_BYTES')
+    if max_bytes is not None:
+        fetcher.config['STREAM_MAX_BYTES'] = max_bytes
+
+    return fetcher
+
 
 def cachekey(request):
     key = request.path
@@ -65,6 +80,7 @@ def station():
         requirements = requirements.split(',')
         requirements = filter(lambda item: item != '', requirements)
 
-    results = fetch(url, score=score, requirements=requirements)
+    fetcher = fetcher_init(url)
+    results = fetcher.fetch(score=score, requirements=requirements)
 
     return results.export()
